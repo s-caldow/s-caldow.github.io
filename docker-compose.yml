@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  homepage:
+    image: ${DOCKER_REGISTRY}homepage
+    build:
+      context: .
+      dockerfile: Homepage/Dockerfile

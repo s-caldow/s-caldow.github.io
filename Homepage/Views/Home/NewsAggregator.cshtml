@@ -1,0 +1,51 @@
+﻿@model IEnumerable<RssItem>
+@{
+    ViewData["Title"] = "Newsfeed";
+}
+
+<header id="header" style="margin-bottom: 50px">
+	<a asp-controller="Home" asp-action="NewsAggregator" class="logo"><strong>Newsfeed</strong></a>
+</header>
+
+<div class="box alt">
+	<div class="row gtr-50 gtr-uniform">
+		@foreach (var item in Model)
+		{
+			<div class="col-12">
+				<div class="header" style="margin-bottom: 20px">
+					<header class="minor">
+						<h3>@item.Title</h3>
+					</header>
+					<div class="left date">@item.DatePublished</div>
+					<div>
+						@item.Description
+					</div>
+					<a class="url" href="@item.Url">Read more...</a>
+					<hr />
+				</div>
+			</div>
+		}
+	</div>
+	
+	<ul class="pagination">
+		@if (ViewBag.page == 1)
+		{
+			<li><span class="button disabled">Prev</span></li>
+		}
+		else
+		{
+			<li><a asp-controller="Home" asp-action="NewsAggregator" asp-route-page="@(ViewBag.page - 1)" class="button">Prev</a></li>
+		}
+
+		@if (ViewBag.page == ViewBag.lastPage)
+		{
+			<li><a href="#" class="button disabled">Next</a></li>
+		}
+		else
+		{
+			<li><a asp-controller="Home" asp-action="NewsAggregator" asp-route-page="@(ViewBag.page + 1)" class="button">Next</a></li>
+		}
+
+	</ul>
+	
+</div>

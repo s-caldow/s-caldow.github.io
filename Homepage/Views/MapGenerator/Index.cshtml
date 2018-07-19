@@ -1,0 +1,99 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+
+<style>
+	.links {
+		stroke: #000;
+		stroke-opacity: 0.2;
+	}
+
+	.polygons {
+		fill: none;
+		stroke: #000;
+	}
+
+	.polygons.found {
+		fill: #f00;
+	}
+
+	.sites {
+		fill: #000;
+		stroke: #fff;
+	}
+</style>
+
+<header id="header">
+	<a asp-controller="MapGenerator" asp-action="Index" class="logo">Fantasy Map Generator</a>
+</header>
+
+<div class="container">
+	<div id="map"><svg width="1300" height="1000"></svg></div>
+	<div id="controls">
+
+	</div>
+</div>
+
+<script>
+	var down = false;
+
+	var svg = d3.select("svg").on("touchmove mousemove", moved);
+		width = +svg.attr("width"),
+		height = +svg.attr("height");
+
+	var sites = d3.range(10000)
+		.map(function (d) { return [Math.random() * (width - 80) + 40, Math.random() * (height - 80) + 40]; });
+
+	var voronoi = d3.voronoi()
+		.extent([[30, 30], [width - 30, height - 30]]);
+
+	var polygon = svg.append("g")
+		.attr("class", "polygons")
+		.selectAll("path")
+		.data(voronoi.polygons(sites))
+		.enter().append("path")
+		.call(redrawPolygon);
+
+	var diagram = voronoi(sites);
+
+	findcell([width / 2, height / 2]);
+
+	function moved() {
+		if (down) {
+			findcelldown(d3.mouse(this));
+		} else {
+			findcell(d3.mouse(this));
+		}
+		
+	}
+
+	function findcell(m) {
+		polygon.attr('fill', '');
+		findcelldown(m);
+	}
+
+	function findcelldown(m) {
+		var found = diagram.find(m[0], m[1], 50);
+		if (found)
+			polygon._groups[0][found.index].setAttribute('fill', 'green');
+	}
+
+	function redraw() {
+		polygon = polygon.data(diagram.polygons()).call(redrawPolygon);
+	}
+
+	function redrawPolygon(polygon) {
+		polygon
+			.attr("d", function (d) { return d ? "M" + d.join("L") + "Z" : null; });
+	}
+
+	d3.select("svg").on("mousedown", function () {
+		down = true;
+	}).on( "mouseup", function () {
+		down = false;
+	});
+
+</script>
